@@ -63,8 +63,6 @@ function draw() {
     nowDotsSize = data.dotsSize * (canvasWidth / BASE_WINDOW_SIZE);
   }
 
-  console.log(nowDotsSize)
-
   for (let i = 0; i < nowDotsNum; i++) {
     const x = floor(random(img.width));
     const y = floor(random(img.height));
