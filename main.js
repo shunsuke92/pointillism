@@ -1,46 +1,77 @@
-const speed = 1200,
-  max = 20,
-  min = 2,
-  sizeChangeSpeed = 0.003, // 大きいほど早く変化する
-  imgNum = 18;
+const BASE_WINDOW_SIZE = 1700
 
-let img,
-  ratio,
-  size,
-  canvas,
-  canvasWidth,
-  canvasHeight,
-  fileName = 'sample',
-  count = 0,
-  volatility;
+let img;
+let ratio;
+let canvas;
+let canvasWidth;
+let canvasHeigh;
+let fileName = 'sample';
+
+const datas = [
+  { img: 'hanabi.jpg',
+    dotsNum: 1000,
+    random: {
+      dotsSizeMax: 8,
+      dotsSizeMin: 0.5,
+      sizeChangeSpeed: 0.002 // 大きいほど早く変化する
+    }
+  },
+  { img: 'hanabi2.jpg',
+    dotsNum: 1000,
+    random: {
+      dotsSizeMax: 8,
+      dotsSizeMin: 0.5,
+      sizeChangeSpeed: 0.002
+    }
+  },
+  { img: 'night-view.jpg',
+    dotsNum: 1000,
+    dotsSize: 3,
+  },
+  { img: 'tokyo-station.jpg',
+    dotsNum: 1000,
+    dotsSize: 3,
+  },
+]
+
+
+function getRandomInt (max) {
+  return Math.floor(Math.random() * max);
+};
+
+const data = datas[getRandomInt(datas.length)];
 
 function preload() {
-  // ランダム表示は無効にする
-  /* img = loadImage(`images/img_${floor(random(1, imgNum + 1))}.jpg`); */
-  img = loadImage('images/img_6.jpg');
+  img = loadImage(`images/${data.img}`);
 }
 
 function setup() {
-  size = max;
-  volatility = max - min;
   noStroke();
   createMyCanvas();
 }
 
 function draw() {
-  const nowNoise = noise(count);
-  const nowSpeed = speed - (1 - nowNoise) * 500;
-  const nowSize = size - nowNoise * volatility;
+  let nowDotsNum;
+  let nowDotsSize;
+  if(data.random !== undefined) {
+    const nowNoise = noise(frameCount * data.random.sizeChangeSpeed);
+    nowDotsNum = data.dotsNum * (canvasWidth / BASE_WINDOW_SIZE);
+    nowDotsSize = (data.random.dotsSizeMax - nowNoise * (data.random.dotsSizeMax - data.random.dotsSizeMin)) * (canvasWidth / BASE_WINDOW_SIZE);
 
-  for (let i = 0; i < nowSpeed; i++) {
+  }else {
+    nowDotsNum = data.dotsNum * (canvasWidth / BASE_WINDOW_SIZE);
+    nowDotsSize = data.dotsSize * (canvasWidth / BASE_WINDOW_SIZE);
+  }
+
+  console.log(nowDotsSize)
+
+  for (let i = 0; i < nowDotsNum; i++) {
     const x = floor(random(img.width));
     const y = floor(random(img.height));
     const color = getPixel(x, y);
     fill(color);
-    circle(x * ratio, y * ratio, nowSize);
+    circle(x * ratio, y * ratio, nowDotsSize);
   }
-
-  count += sizeChangeSpeed;
 }
 
 function createMyCanvas() {
@@ -64,10 +95,10 @@ function createMyCanvas() {
 function getPixel(x, y) {
   const i = (y * img.width + x) * 4;
   return [
-    img.pixels[i],
-    img.pixels[i + 1],
-    img.pixels[i + 2],
-    img.pixels[i + 3],
+    img.pixels[i], // red
+    img.pixels[i + 1], // green
+    img.pixels[i + 2], // blue
+    img.pixels[i + 3], // alpha
   ];
 }
 
